@@ -1,11 +1,12 @@
 <?php
 require_once 'rb-mysql.php';
+require_once 'config.php';
 
 
 R::setup(
-    'mysql:host=localhost;dbname=power-uptimer;charset=utf8mb4',
-    'root',
-    ''
+    Config::$db_host,
+    Config::$db_username,
+    Config::$db_password
 );
 
 R::freeze(true); // true на проде
