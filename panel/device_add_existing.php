@@ -1,5 +1,6 @@
 <?php
 require_once 'auth.php';
+require_once 'header.php';
 
 $user = authUser();
 if (!$user) {
@@ -11,18 +12,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = trim($_POST['token'] ?? '');
 
     if (!$token) {
-        die('Token обязательно');
+        die('Token is required');
     }
 
     $device = R::findOne('device', ' token = ? ', [$token]);
     if (!$device->id) {
-        die('Устройство не найдено');
+        die('Device not found');
     }
 
     $alreadyLinked = R::findOne('userdevice', ' device_id = ? AND user_id = ?', [$device->id, $user->id]);
 
     if (!!$alreadyLinked->id) {
-        die('Устройство уже прилинковано');
+        die('Device already linked');
     }
 
     /** PIVOT */
@@ -37,9 +38,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<h1>Подлинковать устройство</h1>
-
-<form method="post">
-    <input name="token" placeholder="Токен устройства">
-    <button>Добавить</button>
-</form>
+<body>
+<div class="popup-handler-box">
+    <div class="popup-box">
+        <h2>Link existing device</h2>
+        <form method="post" class="vertical-list">
+            <input name="token" placeholder="Device token">
+            <button>Link</button>
+        </form>
+    </div>
+</div>
+</body>

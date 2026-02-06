@@ -1,5 +1,6 @@
 <?php
 require_once 'auth.php';
+require_once 'header.php';
 
 $user = authUser();
 if (!$user) {
@@ -11,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name'] ?? '');
 
     if (!$name) {
-        die('Название обязательно');
+        die('Name is required');
     }
 
     $token = bin2hex(random_bytes(32)); // 🔑 device id
@@ -36,9 +37,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<h1>Добавить устройство</h1>
-
-<form method="post">
-    <input name="name" placeholder="Название устройства">
-    <button>Создать</button>
-</form>
+<body>
+<div class="popup-handler-box">
+    <div class="popup-box">
+        <h2>Create device</h2>
+            <form method="post" class="vertical-list">
+                <input name="name" placeholder="Device name">
+                <button>Create</button>
+            </form>
+    </div>
+</div>
+</body>

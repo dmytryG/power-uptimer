@@ -1,16 +1,17 @@
 <?php
 require_once 'db.php';
+require_once 'header.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
 
     if (!$email || !$password) {
-        die('Email и пароль обязательны');
+        die('Email and password are required');
     }
 
     if (R::findOne('user', ' email = ? ', [$email])) {
-        die('Пользователь уже существует');
+        die('User already exist');
     }
 
     $user = R::dispense('user');
@@ -20,17 +21,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     R::store($user);
 
-    echo 'Регистрация успешна';
+    echo 'Success';
+    header('Location: login.php');
+    exit;
 }
 ?>
 
 <body>
-<form method="post">
-    <input name="email" placeholder="Email">
-    <input name="password" type="password" placeholder="Password">
-    <button type="submit">Register</button>
-</form>
-<a href="login.php">To login</a>
+<div class="content-handler-box">
+    <div class="content-box">
+        <h2>Registration</h2>
+        <div class="menu-and-content-view">
+            <!--            Left side-->
+            <div class="vertical-list">
+                <a href="login.php">➕ To login</a>
+            </div>
+            <!--            Right side-->
+            <div>
+                <form method="post" class="vertical-list">
+                    <input name="email" placeholder="Email">
+                    <input name="password" type="password" placeholder="Password">
+                    <button type="submit">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </body>
-
-

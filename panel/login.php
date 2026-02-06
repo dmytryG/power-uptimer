@@ -1,5 +1,6 @@
 <?php
 require_once 'db.php';
+require_once 'header.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email'] ?? '');
@@ -8,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = R::findOne('user', ' email = ? ', [$email]);
 
     if (!$user || !password_verify($password, $user->password)) {
-        die('Неверные данные');
+        die('Password invalid');
     }
 
     echo $user;
@@ -36,11 +37,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <body>
-<form method="post">
-    <input name="email" placeholder="Email">
-    <input name="password" type="password" placeholder="Password">
-    <button type="submit">Login</button>
-</form>
-<a href="register.php">To registration</a>
+<div class="content-handler-box">
+    <div class="content-box">
+        <h2>Login</h2>
+        <div class="menu-and-content-view">
+            <!--            Left side-->
+            <div class="vertical-list">
+                <a href="register.php">➕ To registration</a>
+            </div>
+            <!--            Right side-->
+            <div>
+                <form method="post" class="vertical-list">
+                    <input name="email" placeholder="Email">
+                    <input name="password" type="password" placeholder="Password">
+                    <button type="submit">Login</button>
+                </form>
+            </div>
+    </div>
+</div>
 </body>
 

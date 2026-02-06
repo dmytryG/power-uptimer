@@ -1,6 +1,7 @@
 <?php
 require_once 'auth.php';
 require_once 'config.php';
+require_once 'js-utils.php';
 
 $user = authUser();
 
@@ -21,43 +22,61 @@ $devices = R::getAll(
 );
 ?>
 
-<h1>Привет, <?= htmlspecialchars($user->email) ?></h1>
-<a href="logout.php">Logout</a>
-<h2>Мои устройства</h2>
+<?php
 
-<a href="device_add.php">➕ Создать устройство</a>
-<a href="device_add_existing.php">➕ Подлинковать устройство</a>
+require_once 'header.php';
 
-<table border="1" cellpadding="6">
-    <tr>
-        <th>Название</th>
-        <th>Статус</th>
-        <th>Последний онлайн</th>
-        <th>Токен</th>
-        <th></th>
-    </tr>
+?>
+<div class="content-handler-box">
+    <div class="content-box">
+        <h2>My devices</h2>
+        <div class="menu-and-content-view">
+<!--            Left side-->
+            <div class="vertical-list">
+                <a href="device_add.php">➕ Create new device</a>
+                <a href="device_add_existing.php">➕ Link existing device</a>
+            </div>
+<!--            Right side-->
+            <div>
+                <table border="1" cellpadding="6">
+                    <tr>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Last online</th>
+                        <th>Token</th>
+                        <th>Actions</th>
+                    </tr>
 
-    <?php foreach ($devices as $d): ?>
-        <?php
-        $lastSeen = strtotime($d['last_seen_at']);
-        $isOnline = (time() - $lastSeen) < Config::$threshhold;
-        ?>
-        <tr>
-            <td><?= htmlspecialchars($d['name']) ?></td>
-            <td style="text-align:center">
-                <?= $isOnline ? '✅' : '❌' ?>
-            </td>
-            <td><?= htmlspecialchars($d['last_seen_at']) ?></td>
-            <td><code><?= htmlspecialchars($d['token']) ?></code></td>
-            <td>
-                <form method="post" action="device_delete.php" onsubmit="return confirm('Удалить устройство?');">
-                    <input type="hidden" name="device_id" value="<?= htmlspecialchars($d['id']) ?>">
-                    <button type="submit">Удалить</button>
-                </form>
-                <a href="device_log.php?id=<?=$d['id'] ?>">Лог</a>
-            </td>
-        </tr>
-    <?php endforeach; ?>
+                    <?php foreach ($devices as $d): ?>
+                        <?php
+                        $lastSeen = strtotime($d['last_seen_at']);
+                        $isOnline = (time() - $lastSeen) < Config::$threshhold;
+                        ?>
+                        <tr>
+                            <td><?= htmlspecialchars($d['name']) ?></td>
+                            <td style="text-align:center">
+                                <?= $isOnline ? '✅' : '❌' ?>
+                            </td>
+                            <td><?= htmlspecialchars($d['last_seen_at']) ?></td>
+                            <td><code class="copy-token"><?= htmlspecialchars($d['token']) ?></code></td>
+                            <td class="vertical-list-tight">
+                                <form method="post" action="device_delete.php" onsubmit="return confirm('Delete device?');">
+                                    <input type="hidden" name="device_id" value="<?= htmlspecialchars($d['id']) ?>">
+                                    <button type="submit">Delete</button>
+                                </form>
+                                <a href="device_log.php?id=<?=$d['id'] ?>">Uptime log</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
-</table>
+
+
+
+
+
 

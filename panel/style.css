@@ -1,0 +1,140 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #15173D;
+    color: #F1E9E9;
+
+    font-family: "Nunito", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}
+
+a {
+    text-decoration: none;
+    color: #E491C9;
+}
+
+a:hover {
+    color: #fcd9fc;
+}
+
+.header-box {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    padding: 20px 0;
+    background-color: #242650;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.large-text {
+    font-size: 1.5rem;
+}
+
+.content-handler-box {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-handler-box {
+    width: 100%;
+    min-height: 50vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-box {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    background-color: #242650;
+}
+
+.content-box {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    background-color: #242650;
+}
+
+.vertical-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.menu-and-content-view {
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+}
+
+.horizontal-1-2-view {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;
+}
+
+.vertical-list-tight {
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* Базовый вид таблиц */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #15173D;
+    border: 1px solid #E491C9;
+}
+
+/* Ячейки */
+table td {
+    padding: 10px 12px;
+    border: 1px solid #E491C9;
+    vertical-align: middle;
+}
+
+/* Чередование строк */
+table tbody tr:nth-child(even) {
+    background-color: #1d1f48;
+}
+
+/* Выравнивание */
+table .text-center {
+    text-align: center;
+}
+
+/* Скролл на мобильных */
+.table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+
+.copy-token {
+    cursor: pointer;
+    user-select: all;
+    padding: 4px 6px;
+    border-radius: 4px;
+}
+
+.copy-token:hover {
+    color: #E491C9;
+}
+
+.copy-token.copied {
+    color: #91e4bf;
+}

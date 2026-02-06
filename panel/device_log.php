@@ -62,14 +62,14 @@ $uptimes = R::getAll(
 
 foreach ($uptimes as $u) {
     $start = new DateTime($u['started_at']);
-    $end   = new DateTime($u['ended_at']);
+    $end = new DateTime($u['ended_at']);
 
     foreach ($days as $day => $_) {
         $dayStart = new DateTime($day . ' 00:00:00');
-        $dayEnd   = new DateTime($day . ' 23:59:59');
+        $dayEnd = new DateTime($day . ' 23:59:59');
 
         $realStart = max($start, $dayStart);
-        $realEnd   = min($end, $dayEnd);
+        $realEnd = min($end, $dayEnd);
 
         if ($realStart < $realEnd) {
             $days[$day] += $realEnd->getTimestamp() - $realStart->getTimestamp();
@@ -82,114 +82,127 @@ $chartLabels = array_reverse(array_keys($days));
 $chartData = array_reverse(
     array_map(fn($s) => round($s / 3600, 2), $days)
 );
+
+function percent($uptimeHours, $totalHours): float
+{
+    if ($totalHours <= 0) return 0;
+    return round(($uptimeHours / $totalHours) * 100, 1);
+}
+
+$chartDataArrayed = [];
+foreach ($chartData as $v) {
+    $chartDataArrayed[] = $v;
+}
+$chartDataArrayed = array_reverse($chartDataArrayed);
+
+$last3DaysHours = array_sum(array_slice($chartDataArrayed, 0, 3));
+$weekHours = array_sum(array_slice($chartDataArrayed, 0, 7));
 ?>
-
-<h2><a href="index.php">Домой</a></h2>
-<h2>Лог устройства <?=$device->name ?></h2>
-
-<h3>Онлайн за последние 7 дней (часы)</h3>
-
-<canvas id="uptimeChart" height="120"></canvas>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
-    const ctx = document.getElementById('uptimeChart');
-
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: <?= json_encode($chartLabels) ?>,
-            datasets: [{
-                label: 'Часов онлайн',
-                data: <?= json_encode($chartData) ?>,
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Часы'
-                    }
-                }
-            }
-        }
-    });
-</script>
 
 <?php
-    function percent($uptimeHours, $totalHours): float {
-        if ($totalHours <= 0) return 0;
-        return round(($uptimeHours / $totalHours) * 100, 1);
-    }
 
-    $chartDataArrayed = [];
-    foreach ($chartData as $v) {
-        $chartDataArrayed[] = $v;
-    }
-    $chartDataArrayed = array_reverse($chartDataArrayed);
+require_once 'header.php';
 
-    $last3DaysHours = array_sum(array_slice($chartDataArrayed, 0, 3));
-    $weekHours = array_sum(array_slice($chartDataArrayed, 0, 7));
-
-//    var_dump($chartDataArrayed);
 ?>
 
+<body>
+<div class="content-handler-box">
+    <div class="content-box">
+        <h2>Log of <?= htmlspecialchars($device->name) ?></h2>
+        <div class="horizontal-1-2-view">
+            <!--            Left side-->
+            <div class="vertical-list">
+                <table border="1" cellpadding="6">
+                    <tr>
+                        <th>Interval</th>
+                        <th>Uptime %</th>
+                        <th>Uptime (hours)</th>
+                        <th>Downtime (hours)</th>
+                    </tr>
 
-<table border="1" cellpadding="6">
-    <tr>
-        <th>Период</th>
-        <th>Аптайм %</th>
-        <th>Аптайм (часы)</th>
-        <th>Даунтайм (часы)</th>
-    </tr>
+                    <tr>
+                        <td>Today</td>
+                        <td><?= percent($chartDataArrayed[0], 24) ?>%</td>
+                        <td><?= $chartDataArrayed[0] ?></td>
+                        <td><?= 24 - $chartDataArrayed[0] ?></td>
+                    </tr>
 
-    <tr>
-        <td>Сегодня</td>
-        <td><?= percent($chartDataArrayed[0], 24) ?>%</td>
-        <td><?= $chartDataArrayed[0] ?></td>
-        <td><?= 24 - $chartDataArrayed[0] ?></td>
-    </tr>
+                    <tr>
+                        <td>Yesterday</td>
+                        <td><?= percent($chartDataArrayed[1], 24) ?>%</td>
+                        <td><?= $chartDataArrayed[1] ?></td>
+                        <td><?= 24 - $chartDataArrayed[1] ?></td>
+                    </tr>
 
-    <tr>
-        <td>Вчера</td>
-        <td><?= percent($chartDataArrayed[1], 24) ?>%</td>
-        <td><?= $chartDataArrayed[1] ?></td>
-        <td><?= 24 - $chartDataArrayed[1] ?></td>
-    </tr>
+                    <tr>
+                        <td>3 Days</td>
+                        <td><?= percent($last3DaysHours, 72) ?>%</td>
+                        <td><?= $last3DaysHours ?></td>
+                        <td><?= 72 - $last3DaysHours ?></td>
+                    </tr>
 
-    <tr>
-        <td>3 дня</td>
-        <td><?= percent($last3DaysHours, 72) ?>%</td>
-        <td><?= $last3DaysHours ?></td>
-        <td><?= 72 - $last3DaysHours ?></td>
-    </tr>
+                    <tr>
+                        <td>Week</td>
+                        <td><?= percent($weekHours, 168) ?>%</td>
+                        <td><?= $weekHours ?></td>
+                        <td><?= 168 - $weekHours ?></td>
+                    </tr>
+                </table>
+            </div>
+            <!--            Right side-->
+            <div>
+                <h3>Uptime last week (in hours)</h3>
 
-    <tr>
-        <td>Неделя</td>
-        <td><?= percent($weekHours, 168) ?>%</td>
-        <td><?= $weekHours ?></td>
-        <td><?= 168 - $weekHours ?></td>
-    </tr>
-</table>
+                <canvas id="uptimeChart" height="120"></canvas>
 
-<table border="1" cellpadding="6">
-    <tr>
-        <th>#</th>
-        <th>Период начало</th>
-        <th>Период конец</th>
-    </tr>
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <?php foreach ($logs as $i => $l): ?>
-        <tr>
-            <td><?= $i+1 ?></td>
-            <td><?= htmlspecialchars($l['started_at']) ?></td>
-            <td><?= htmlspecialchars($l['ended_at']) ?></td>
-        </tr>
-    <?php endforeach; ?>
+                <script>
+                    const ctx = document.getElementById('uptimeChart');
 
-</table>
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: <?= json_encode($chartLabels) ?>,
+                            datasets: [{
+                                label: 'Uptime hours',
+                                data: <?= json_encode($chartData) ?>,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Hours'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                </script>
+                <h3>Detailed log (uptimes)</h3>
+                <table border="1" cellpadding="6">
+                    <tr>
+                        <th>#</th>
+                        <th>Uptime start</th>
+                        <th>Uptime end</th>
+                        <th>Uptime total time (h)</th>
+                    </tr>
 
+                    <?php foreach ($logs as $i => $l): ?>
+                        <tr>
+                            <td><?= $i + 1 ?></td>
+                            <td><?= htmlspecialchars($l['started_at']) ?></td>
+                            <td><?= htmlspecialchars($l['ended_at']) ?></td>
+                            <td><?= round(htmlspecialchars(strtotime($l['ended_at']) - strtotime($l['started_at'])) / 3600, 2) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
