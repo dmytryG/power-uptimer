@@ -53,6 +53,18 @@ function registerDevicePing($token): string
         R::store($uptime);
     }
 
+    $uptimeIds = R::getCol(
+        'SELECT id FROM deviceuptime 
+         WHERE device_id = ?
+         ORDER BY ended_at DESC
+         LIMIT 100, 1000',
+        [$device->id]
+    );
+
+    if ($uptimeIds) {
+        R::trashAll(R::loadAll('deviceuptime', $uptimeIds));
+    }
+
     return 'ok';
 }
 
