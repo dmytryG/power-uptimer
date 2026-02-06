@@ -1,5 +1,6 @@
 <?php
 require_once 'auth.php';
+require_once 'config.php';
 
 $user = authUser();
 
@@ -39,7 +40,7 @@ $devices = R::getAll(
     <?php foreach ($devices as $d): ?>
         <?php
         $lastSeen = strtotime($d['last_seen_at']);
-        $isOnline = (time() - $lastSeen) < 600;
+        $isOnline = (time() - $lastSeen) < Config::$threshhold;
         ?>
         <tr>
             <td><?= htmlspecialchars($d['name']) ?></td>
@@ -53,6 +54,7 @@ $devices = R::getAll(
                     <input type="hidden" name="device_id" value="<?= htmlspecialchars($d['id']) ?>">
                     <button type="submit">Удалить</button>
                 </form>
+                <a href="device_log.php?id=<?=$d['id'] ?>">Лог</a>
             </td>
         </tr>
     <?php endforeach; ?>
