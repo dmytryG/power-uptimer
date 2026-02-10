@@ -38,6 +38,7 @@ $logs = R::getAll(
 
 $days = [];
 $now = new DateTime('now');
+$timeNow = new DateTime('now');
 $now->setTime(23, 59, 59);
 
 // инициализируем последние 7 дней
@@ -97,6 +98,28 @@ $chartDataArrayed = array_reverse($chartDataArrayed);
 
 $last3DaysHours = array_sum(array_slice($chartDataArrayed, 0, 3));
 $weekHours = array_sum(array_slice($chartDataArrayed, 0, 7));
+
+$lastEntry = $logs[0];
+$lastSeen = $lastEntry ? strtotime($lastEntry['ended_at']) : $device['last_seen_at'];
+$isOnline = (time() - $lastSeen) < Config::$threshhold;
+$lastUptimeDuration = $logs[0] ? round(((new DateTime($logs[0]['ended_at']))->getTimestamp() - (new DateTime($logs[0]['started_at']))->getTimestamp()) / 3600, 2) : 'n/a';
+if ($logs[0]) {
+    $lastDowntimeDuration = $logs[0] ? round(($timeNow->getTimestamp() - (new DateTime($logs[0]['ended_at']))->getTimestamp()) / 3600, 2) : 'n/a';
+    if ($lastDowntimeDuration < 1) {
+        $downtimeEmoji = '🟢';
+    } else if ($lastDowntimeDuration < 3) {
+        $downtimeEmoji = '😐';
+    } else if ($lastDowntimeDuration < 6) {
+        $downtimeEmoji = '😠';
+    } else if ($lastDowntimeDuration < 8) {
+        $downtimeEmoji = '🖕';
+    } else if ($lastDowntimeDuration < 12) {
+        $downtimeEmoji = '☠️';
+    } else {
+        $downtimeEmoji = '🚨';
+    }
+}
+$lastDowntimeDuration = $logs[0] ? round(($timeNow->getTimestamp() - (new DateTime($logs[0]['ended_at']))->getTimestamp()) / 3600, 2) : 'n/a';
 ?>
 
 <?php
@@ -112,6 +135,12 @@ require_once 'header.php';
         <div class="horizontal-1-2-view">
             <!--            Left side-->
             <div class="vertical-list">
+                <span>Time now: <?= $timeNow->format('Y-m-d H:i:s')?></span>
+                <?php if ($isOnline): ?>
+                    <span>🔼 Up for <?= $lastUptimeDuration?> hours</span>
+                <?php else: ?>
+                    <span>🔽 Down for <?= $lastDowntimeDuration?> hours <?= $downtimeEmoji ?></span>
+                <?php endif; ?>
                 <table border="1" cellpadding="6">
                     <tr>
                         <th>Interval</th>
